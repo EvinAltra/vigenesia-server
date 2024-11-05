@@ -23,6 +23,26 @@ class registrasi extends REST_Controller
         // Load the user model
         $this->load->model('user');
     }
+    public function index_get()
+    {
+        $id = $this->get('iduser');
+        if ($id == '') {
+            $api = $this->db->get('user')->result();
+        } else {
+            $this->db->where('iduser', $id);
+            $api = $this->db->get('user')->result();
+        }
+        // Menampilkan data pengguna yang ditemukan
+        if (!empty($api)) {
+            $this->response($api, REST_Controller::HTTP_OK);
+        } else {
+            $this->response([
+                'status' => FALSE,
+                'message' => 'User not found'
+            ], REST_Controller::HTTP_NOT_FOUND);
+        }
+    }
+
     public function index_post()
     {
 
@@ -54,7 +74,7 @@ class registrasi extends REST_Controller
 
                     'profesi' => $profesi,
                     'email' => $email,
-                    'password' => md5($password),
+                    'password' => password_hash($password, PASSWORD_DEFAULT),
 
                 );
                 $insert = $this->user->insert($userData);
